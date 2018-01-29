@@ -27,6 +27,16 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& rm -f /var/cache/apt/*.bin
 
+# Install Bazel dependencies
+# TODO: Remove from here and add to install script
+RUN apt-get update \
+    && apt-get -y install openjdk-8-jdk \
+    && echo "deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list \
+    && curl https://bazel.build/bazel-release.pub.gpg | sudo apt-key add - \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends bazel \
+    && bazel --batch version
+
 # Create a jenkins user for Jenkins CI and grant it passwordless sudo access
 RUN useradd --uid 10000 --create-home --shell /bin/bash jenkins \
 	&& echo "" >> /etc/sudoers \
